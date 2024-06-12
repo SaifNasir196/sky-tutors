@@ -1,22 +1,30 @@
-import React, { FC, ReactNode } from 'react'
-import './globals.css'
-import Link from 'next/link';
+import type { Metadata } from "next";
+import { Inter, IBM_Plex_Serif } from "next/font/google";
+import React, { ReactNode } from 'react'
+import "./globals.css";
 
-interface LayoutProps {
-  children: ReactNode;
-}
+const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
+
+const ibmPlexSerif = IBM_Plex_Serif({
+  subsets: ['latin'], // useful for optimizing the font loading by including only the necessary charsets.
+  weight: ['400', '700'],
+  variable: '--font-ibm-plex-serif'
+})
 
 
-const Layout: FC<LayoutProps> = ({ children }) => {
+export const metadata: Metadata = {
+  title: "Sky Tutors",
+  description: "Sky Tutors is an institute by and for World-Class students.",
+  icons: {
+    icon: '/icons/logo.svg'
+  }
+};
+
+
+const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <html>
+     <html className={`${inter.variable} ${ibmPlexSerif.variable}`}>
       <body className = 'main'>
-        <div className='navbar'>
-          <Link href="/"><h1>SkyTutors</h1></Link>
-          <Link href="/about-us">About Us</Link>
-          <Link href="/contact-us">Contact Us</Link>
-          <Link href="/pricing">Pricing</Link>
-        </div>
         {children}
       </body>
     </html>
@@ -24,4 +32,4 @@ const Layout: FC<LayoutProps> = ({ children }) => {
   )
 }
 
-export default Layout;
+export default RootLayout;
