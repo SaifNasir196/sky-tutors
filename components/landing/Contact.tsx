@@ -15,7 +15,7 @@ export default function Contact() {
 
     if (isSubmitted) {
         return (
-            <div className={"flex flex-col h-full w-3/4 my-24 justify-center"}>
+            <div className={"flex flex-col h-full w-3/4 justify-center"}>
                 <Card className="w-full max-w-md mx-auto">
                     <CardContent className="pt-6">
                         <div className="flex flex-col items-center text-center space-y-2">

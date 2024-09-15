@@ -108,6 +108,18 @@ const features = [
     },
     {
         Icon: MessageCircle,
+        name: "Coming Soon",
+        description: "New feature coming soon!",
+        href: "/chat",
+        cta: "Coming Soon!",
+        className: "col-span-3 lg:col-span-2",
+        background: (
+            <div className="absolute inset-0 flex flex-col justify-start p-6 [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)]">
+            </div>
+        ),
+    },
+    {
+        Icon: MessageCircle,
         name: "Tutor Chat",
         description: "Get instant help from our expert tutors.",
         href: "/chat",

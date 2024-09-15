@@ -7,7 +7,7 @@ import { tutors } from "@/lib/data";
 export default function Tutors() {
     const { ref } = useActiveSectionView("Tutors");
     return (
-        <div id="tutors" ref={ref} className={"flex flex-col h-full w-3/4 my-24 justify-center"}>
+        <div id="tutors" ref={ref} className={"flex flex-col h-full w-3/4 my-24 justify-center scroll-mt-32"}>
             <AnimatedShinyTextWrapper>Tutors</AnimatedShinyTextWrapper>
             <h1 className=" my-12 pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-slate-900 to-gray-500/50 bg-clip-text text-center text-5xl font-bold leading-none text-transparent dark:from-white dark:to-white/80">
                 Find Your Perfect Tutor

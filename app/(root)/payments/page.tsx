@@ -1,205 +1,182 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DollarSign, ArrowUpRight, ArrowDownRight, Search, Download } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { CreditCard, Plus, Trash2 } from 'lucide-react'
 
-// Mock data for demonstration
-const transactions = [
-    { id: 1, date: '2023-06-01', type: 'Payment', amount: 150, status: 'Completed', user: 'Alice Johnson' },
-    { id: 2, date: '2023-06-02', type: 'Payout', amount: 100, status: 'Pending', user: 'Bob Smith' },
-    { id: 3, date: '2023-06-03', type: 'Refund', amount: 50, status: 'Completed', user: 'Charlie Brown' },
-    // Add more mock transactions as needed
+interface PaymentMethod {
+    id: string;
+    type: 'credit' | 'debit';
+    last4: string;
+    expiry: string;
+}
+
+interface Transaction {
+    id: string;
+    date: string;
+    description: string;
+    amount: number;
+    status: 'completed' | 'pending' | 'failed';
+}
+
+const paymentMethods: PaymentMethod[] = [
+    { id: '1', type: 'credit', last4: '4242', expiry: '12/24' },
+    { id: '2', type: 'debit', last4: '5555', expiry: '10/23' },
 ]
 
-const tutors = [
-    { id: 1, name: 'Bob Smith', email: 'bob@example.com', balance: 250 },
-    { id: 2, name: 'Diana Prince', email: 'diana@example.com', balance: 175 },
-    // Add more mock tutors as needed
+const transactions: Transaction[] = [
+    { id: '1', date: '2023-06-15', description: 'Advanced Mathematics Course', amount: 199.99, status: 'completed' },
+    { id: '2', date: '2023-06-01', description: 'Monthly Subscription', amount: 49.99, status: 'completed' },
+    { id: '3', date: '2023-05-15', description: 'GCSE Physics Course', amount: 149.99, status: 'completed' },
 ]
 
-export default function PaymentAndBilling() {
-    const [searchTerm, setSearchTerm] = useState('')
-    const [typeFilter, setTypeFilter] = useState('All')
-    const [statusFilter, setStatusFilter] = useState('All')
-
-    const filteredTransactions = transactions.filter(transaction =>
-        (transaction.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            transaction.id.toString().includes(searchTerm)) &&
-        (typeFilter === 'All' || transaction.type === typeFilter) &&
-        (statusFilter === 'All' || transaction.status === statusFilter)
-    )
-
-    const totalRevenue = transactions.reduce((sum, transaction) =>
-        transaction.type === 'Payment' ? sum + transaction.amount : sum, 0
-    )
-
-    const totalPayouts = transactions.reduce((sum, transaction) =>
-        transaction.type === 'Payout' ? sum + transaction.amount : sum, 0
-    )
+export default function PaymentPage() {
+    const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>(paymentMethods[0].id)
 
     return (
-        <div className="space-y-6 m-24">
-            <h1 className="text-3xl font-bold">Payment and Billing</h1>
+        <div className="m-24 space-y-8">
+            <h1 className="text-3xl font-bold text-primary">Payments & Billing</h1>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
-                        <p className="text-xs text-muted-foreground">+20% from last month</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Payouts</CardTitle>
-                        <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">${totalPayouts.toFixed(2)}</div>
-                        <p className="text-xs text-muted-foreground">+5% from last month</p>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Platform Balance</CardTitle>
-                        <ArrowDownRight className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">${(totalRevenue - totalPayouts).toFixed(2)}</div>
-                        <p className="text-xs text-muted-foreground">Current balance</p>
-                    </CardContent>
-                </Card>
-            </div>
-
-            <Tabs defaultValue="transactions" className="space-y-4">
+            <Tabs defaultValue="payment-methods">
                 <TabsList>
-                    <TabsTrigger value="transactions">Transactions</TabsTrigger>
-                    <TabsTrigger value="payouts">Tutor Payouts</TabsTrigger>
+                    <TabsTrigger value="payment-methods">Payment Methods</TabsTrigger>
+                    <TabsTrigger value="billing-history">Billing History</TabsTrigger>
                 </TabsList>
-                <TabsContent value="transactions" className="space-y-4">
-                    <div className="flex space-x-4">
-                        <div className="flex-1">
-                            <Label htmlFor="search" className="sr-only">Search transactions</Label>
-                            <div className="relative">
-                                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="search"
-                                    placeholder="Search transactions..."
-                                    className="pl-8"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <Select value={typeFilter} onValueChange={setTypeFilter}>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Filter by type" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="All">All Types</SelectItem>
-                                <SelectItem value="Payment">Payment</SelectItem>
-                                <SelectItem value="Payout">Payout</SelectItem>
-                                <SelectItem value="Refund">Refund</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Filter by status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="All">All Statuses</SelectItem>
-                                <SelectItem value="Completed">Completed</SelectItem>
-                                <SelectItem value="Pending">Pending</SelectItem>
-                                <SelectItem value="Failed">Failed</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Button variant="outline">
-                            <Download className="mr-2 h-4 w-4" />
-                            Export
-                        </Button>
-                    </div>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Transaction ID</TableHead>
-                                <TableHead>Date</TableHead>
-                                <TableHead>Type</TableHead>
-                                <TableHead>Amount</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>User</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredTransactions.map((transaction) => (
-                                <TableRow key={transaction.id}>
-                                    <TableCell className="font-medium">{transaction.id}</TableCell>
-                                    <TableCell>{transaction.date}</TableCell>
-                                    <TableCell>{transaction.type}</TableCell>
-                                    <TableCell>${transaction.amount.toFixed(2)}</TableCell>
-                                    <TableCell>{transaction.status}</TableCell>
-                                    <TableCell>{transaction.user}</TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TabsContent>
-                <TabsContent value="payouts" className="space-y-4">
-                    <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-bold">Tutor Payouts</h2>
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <Button>Process Payouts</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Process Payouts</DialogTitle>
-                                    <DialogDescription>
-                                        This will initiate payouts for all eligible tutors. Are you sure you want to proceed?
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <DialogFooter>
-                                    <Button type="submit" onClick={() => console.log('Processing payouts')}>
-                                        Confirm Payouts
-                                    </Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Tutor Name</TableHead>
-                                <TableHead>Email</TableHead>
-                                <TableHead>Current Balance</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {tutors.map((tutor) => (
-                                <TableRow key={tutor.id}>
-                                    <TableCell className="font-medium">{tutor.name}</TableCell>
-                                    <TableCell>{tutor.email}</TableCell>
-                                    <TableCell>${tutor.balance.toFixed(2)}</TableCell>
-                                    <TableCell>
-                                        <Button variant="outline" size="sm" onClick={() => console.log(`Payout for ${tutor.name}`)}>
-                                            Payout
+
+                <TabsContent value="payment-methods" className="space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Your Payment Methods</CardTitle>
+                            <CardDescription>Manage your saved payment methods</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            {paymentMethods.map((method) => (
+                                <div key={method.id} className="flex items-center justify-between p-4 border rounded-lg">
+                                    <div className="flex items-center space-x-4">
+                                        <CreditCard className="h-6 w-6 text-primary" />
+                                        <div>
+                                            <p className="font-medium">{method.type === 'credit' ? 'Credit Card' : 'Debit Card'}</p>
+                                            <p className="text-sm text-muted-foreground">**** **** **** {method.last4}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <p className="text-sm text-muted-foreground">Expires {method.expiry}</p>
+                                        <Button variant="ghost" size="icon">
+                                            <Trash2 className="h-4 w-4" />
                                         </Button>
-                                    </TableCell>
-                                </TableRow>
+                                    </div>
+                                </div>
                             ))}
-                        </TableBody>
-                    </Table>
+                        </CardContent>
+                        <CardFooter>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button className="w-full">
+                                        <Plus className="mr-2 h-4 w-4" /> Add Payment Method
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                        <DialogTitle>Add New Payment Method</DialogTitle>
+                                        <DialogDescription>Enter your card details to add a new payment method.</DialogDescription>
+                                    </DialogHeader>
+                                    <div className="grid gap-4 py-4">
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="card-number" className="text-right">Card Number</Label>
+                                            <Input id="card-number" placeholder="1234 5678 9012 3456" className="col-span-3" />
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="expiry" className="text-right">Expiry Date</Label>
+                                            <Input id="expiry" placeholder="MM/YY" className="col-span-3" />
+                                        </div>
+                                        <div className="grid grid-cols-4 items-center gap-4">
+                                            <Label htmlFor="cvv" className="text-right">CVV</Label>
+                                            <Input id="cvv" placeholder="123" className="col-span-3" />
+                                        </div>
+                                    </div>
+                                    <DialogFooter>
+                                        <Button type="submit">Add Payment Method</Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </CardFooter>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Make a Payment</CardTitle>
+                            <CardDescription>Pay for your courses or subscription</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="payment-amount">Payment Amount</Label>
+                                <Input id="payment-amount" type="number" placeholder="0.00" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="payment-method">Payment Method</Label>
+                                <Select value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
+                                    <SelectTrigger id="payment-method">
+                                        <SelectValue placeholder="Select a payment method" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {paymentMethods.map((method) => (
+                                            <SelectItem key={method.id} value={method.id}>
+                                                {method.type === 'credit' ? 'Credit Card' : 'Debit Card'} (*{method.last4})
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </CardContent>
+                        <CardFooter>
+                            <Button className="w-full">Make Payment</Button>
+                        </CardFooter>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="billing-history">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Billing History</CardTitle>
+                            <CardDescription>View your past transactions</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead>Description</TableHead>
+                                        <TableHead>Amount</TableHead>
+                                        <TableHead>Status</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {transactions.map((transaction) => (
+                                        <TableRow key={transaction.id}>
+                                            <TableCell>{transaction.date}</TableCell>
+                                            <TableCell>{transaction.description}</TableCell>
+                                            <TableCell>£{transaction.amount.toFixed(2)}</TableCell>
+                                            <TableCell>
+                                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${transaction.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                                    transaction.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                        'bg-red-100 text-red-800'
+                                                    }`}>
+                                                    {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+                                                </span>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
         </div>

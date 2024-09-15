@@ -13,7 +13,7 @@ export default function Courses() {
     const { ref } = useActiveSectionView("Courses");
 
     return (
-        <div className="flex h-ful w-3/4 my-24 flex-col items-center justify-center overflow-hidden rounded-lg scroll-mt-5" id="courses" ref={ref}>
+        <div className="flex h-ful w-3/4 my-24 flex-col items-center justify-center overflow-hidden rounded-lg scroll-mt-32" id="courses" ref={ref}>
             <AnimatedShinyTextWrapper> Courses </AnimatedShinyTextWrapper>
             <h1 className=" my-12 pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-slate-900 to-gray-500/50 bg-clip-text text-center text-5xl font-bold leading-none text-transparent dark:from-white dark:to-white/80">
                 Choose Your Course

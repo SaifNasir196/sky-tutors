@@ -11,15 +11,15 @@ const ParticlesBackground = ({
 }: Readonly<{
     children: React.ReactNode;
 }>) => {
-    const { theme } = useTheme();
+    const { resolvedTheme } = useTheme();
     const [color, setColor] = useState("#ffffff");
 
     useEffect(() => {
-        setColor(theme === "dark" ? "#ffffff" : "#000000");
-    }, [theme]);
+        setColor(resolvedTheme === "dark" ? "#ffffff" : "#000000");
+    }, [resolvedTheme]);
 
     return (
-        <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background md:shadow-xl  ">
+        <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background md:shadow-xl">
             {children}
             <Meteors number={4} />
             <Particles

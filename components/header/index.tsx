@@ -95,7 +95,7 @@ export default function Header() {
             )}
 
             <motion.nav
-                className="fixed top-0 right-1 h-[4.5rem] w-full rounded-none border border-white border-opacity-40 bg-gray-200
+                className="fixed top-0 right-1 h-[4.5rem] w-full rounded-none border border-white border-opacity-40 bg-white
                     bg-opacity-80 shadow-lg shadow-black/[0.03] backdrop-blur-[0.5rem] sm:top-6 sm:h-[3.25rem] sm:w-fit
                     sm:rounded-full dark:bg-gray-950 dark:border-black/40 dark:bg-opacity-75 px-2 py-1"
                 initial={{ y: -100, x: "-50%", opacity: 0 }}

@@ -23,7 +23,7 @@ const ContactForm = () => {
 
     return (
         <section
-            className='flex flex-col h-full w-3/4 my-24 justify-center items-center'
+            className='flex flex-col h-full w-3/4 mb-36 justify-center items-center'
             id='contact'
             ref={ref}
         >

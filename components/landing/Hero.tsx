@@ -25,7 +25,7 @@ const HeroSection = () => {
             <div className="flex gap-4">
 
 
-                <PulsatingButton duration='2s' >Join Affiliate Program</PulsatingButton>
+                <PulsatingButton duration='4s' >Join now</PulsatingButton>
                 <ShinyButton text="Contact Us" className="" />
 
             </div>

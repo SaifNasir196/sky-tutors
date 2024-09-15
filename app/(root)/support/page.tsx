@@ -1,254 +1,167 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Search, MessageSquare, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { MessageSquare, Send } from 'lucide-react'
 
-type TicketStatus = 'Open' | 'In Progress' | 'Closed'
-type TicketPriority = 'High' | 'Medium' | 'Low'
-
-interface Ticket {
-    id: number
-    user: string
-    subject: string
-    status: TicketStatus
-    priority: TicketPriority
-    created: string
-}
-
-// Mock data for demonstration
-const tickets: Ticket[] = [
-    { id: 1, user: 'Alice Johnson', subject: 'Cannot access course materials', status: 'Open', priority: 'High', created: '2023-06-01' },
-    { id: 2, user: 'Bob Smith', subject: 'Billing inquiry', status: 'In Progress', priority: 'Medium', created: '2023-06-02' },
-    { id: 3, user: 'Charlie Brown', subject: 'Technical issue during live session', status: 'Closed', priority: 'Low', created: '2023-06-03' },
-    { id: 4, user: 'Diana Prince', subject: 'Request for refund', status: 'Open', priority: 'High', created: '2023-06-04' },
-    { id: 5, user: 'Ethan Hunt', subject: 'Tutor no-show complaint', status: 'In Progress', priority: 'High', created: '2023-06-05' },
+const faqs = [
+    {
+        question: "How do I enroll in a course?",
+        answer: "To enroll in a course, navigate to the course page and click the 'Enroll Now' button. Follow the prompts to complete your enrollment and payment."
+    },
+    {
+        question: "What payment methods do you accept?",
+        answer: "We accept major credit and debit cards, as well as PayPal. You can manage your payment methods in the Payments & Billing section of your account."
+    },
+    {
+        question: "How can I contact my tutor?",
+        answer: "You can contact your tutor through the messaging system in your course dashboard. Navigate to the course and click on the 'Message Tutor' button."
+    },
+    {
+        question: "What is your refund policy?",
+        answer: "We offer a 30-day money-back guarantee for most courses. If you're unsatisfied with a course, you can request a refund within 30 days of enrollment."
+    },
+    {
+        question: "How do I access my course materials?",
+        answer: "Once enrolled, you can access your course materials by logging into your account and navigating to 'My Courses'. Click on the course to view all available materials and lessons."
+    }
 ]
 
-export default function CustomerSupport() {
-    const [searchTerm, setSearchTerm] = useState<string>('')
-    const [statusFilter, setStatusFilter] = useState<TicketStatus | 'All'>('All')
-    const [priorityFilter, setPriorityFilter] = useState<TicketPriority | 'All'>('All')
-    const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
+export default function SupportPage() {
+    const [chatMessages, setChatMessages] = useState<{ sender: 'user' | 'support', message: string }[]>([
+        { sender: 'support', message: "Hello! How can I assist you today?" }
+    ])
+    const [newMessage, setNewMessage] = useState('')
 
-    const filteredTickets = tickets.filter(ticket =>
-        (ticket.user.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            ticket.subject.toLowerCase().includes(searchTerm.toLowerCase())) &&
-        (statusFilter === 'All' || ticket.status === statusFilter) &&
-        (priorityFilter === 'All' || ticket.priority === priorityFilter)
-    )
-
-    const getStatusColor = (status: TicketStatus): string => {
-        switch (status) {
-            case 'Open': return 'bg-yellow-500'
-            case 'In Progress': return 'bg-blue-500'
-            case 'Closed': return 'bg-green-500'
-        }
-    }
-
-    const getPriorityColor = (priority: TicketPriority): string => {
-        switch (priority) {
-            case 'High': return 'bg-red-500'
-            case 'Medium': return 'bg-orange-500'
-            case 'Low': return 'bg-green-500'
+    const handleSendMessage = () => {
+        if (newMessage.trim()) {
+            setChatMessages([...chatMessages, { sender: 'user', message: newMessage }])
+            setNewMessage('')
+            // Simulate a response from support
+            setTimeout(() => {
+                setChatMessages(prev => [...prev, { sender: 'support', message: "Thank you for your message. A support representative will be with you shortly." }])
+            }, 1000)
         }
     }
 
     return (
-        <div className="space-y-6 m-24">
+        <div className="m-24 space-y-8">
+            <h1 className="text-3xl font-bold text-primary">Support Center</h1>
 
-            <div className="flex justify-between items-center">
-                <h1 className="text-3xl font-bold">Customer Support</h1>
-                <Button>
-                    <MessageSquare className="mr-2 h-4 w-4" />
-                    New Ticket
-                </Button>
-            </div>
+            <Tabs defaultValue="faq">
+                <TabsList>
+                    <TabsTrigger value="faq">FAQ</TabsTrigger>
+                    <TabsTrigger value="ticket">Submit a Ticket</TabsTrigger>
+                    <TabsTrigger value="chat">Live Chat</TabsTrigger>
+                </TabsList>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Total Tickets</CardTitle>
-                        <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{tickets.length}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Open Tickets</CardTitle>
-                        <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{tickets.filter(t => t.status === 'Open').length}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-                        <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{tickets.filter(t => t.status === 'In Progress').length}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Closed Tickets</CardTitle>
-                        <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{tickets.filter(t => t.status === 'Closed').length}</div>
-                    </CardContent>
-                </Card>
-            </div>
+                <TabsContent value="faq">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Frequently Asked Questions</CardTitle>
+                            <CardDescription>Find quick answers to common questions</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <Accordion type="single" collapsible className="w-full">
+                                {faqs.map((faq, index) => (
+                                    <AccordionItem key={index} value={`item-${index}`}>
+                                        <AccordionTrigger>{faq.question}</AccordionTrigger>
+                                        <AccordionContent>{faq.answer}</AccordionContent>
+                                    </AccordionItem>
+                                ))}
+                            </Accordion>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="ticket">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Submit a Support Ticket</CardTitle>
+                            <CardDescription>We'll get back to you as soon as possible</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="subject">Subject</Label>
+                                <Input id="subject" placeholder="Enter the subject of your inquiry" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="category">Category</Label>
+                                <Select>
+                                    <SelectTrigger id="category">
+                                        <SelectValue placeholder="Select a category" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="technical">Technical Issue</SelectItem>
+                                        <SelectItem value="billing">Billing Inquiry</SelectItem>
+                                        <SelectItem value="course">Course-related Question</SelectItem>
+                                        <SelectItem value="other">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="message">Message</Label>
+                                <Textarea id="message" placeholder="Describe your issue or question in detail" />
+                            </div>
+                        </CardContent>
+                        <CardFooter>
+                            <Button className="w-full">Submit Ticket</Button>
+                        </CardFooter>
+                    </Card>
+                </TabsContent>
+
+                <TabsContent value="chat">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Live Chat Support</CardTitle>
+                            <CardDescription>Chat with our support team in real-time</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="h-[400px] overflow-y-auto border rounded-md p-4 mb-4">
+                                {chatMessages.map((msg, index) => (
+                                    <div key={index} className={`mb-2 ${msg.sender === 'user' ? 'text-right' : ''}`}>
+                                        <span className={`inline-block p-2 rounded-lg ${msg.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-secondary'
+                                            }`}>
+                                            {msg.message}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="flex space-x-2">
+                                <Input
+                                    value={newMessage}
+                                    onChange={(e) => setNewMessage(e.target.value)}
+                                    placeholder="Type your message here..."
+                                    onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                                />
+                                <Button onClick={handleSendMessage}>
+                                    <Send className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Support Tickets</CardTitle>
-                    <CardDescription>Manage and respond to customer support tickets</CardDescription>
+                    <CardTitle>Contact Information</CardTitle>
+                    <CardDescription>Reach out to us directly</CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <div className="flex space-x-4 mb-4">
-                        <div className="flex-1">
-                            <Label htmlFor="search" className="sr-only">Search tickets</Label>
-                            <div className="relative">
-                                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="search"
-                                    placeholder="Search tickets..."
-                                    className="pl-8"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as TicketStatus | 'All')}>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Filter by status" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="All">All Statuses</SelectItem>
-                                <SelectItem value="Open">Open</SelectItem>
-                                <SelectItem value="In Progress">In Progress</SelectItem>
-                                <SelectItem value="Closed">Closed</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Select value={priorityFilter} onValueChange={(value) => setPriorityFilter(value as TicketPriority | 'All')}>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder="Filter by priority" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="All">All Priorities</SelectItem>
-                                <SelectItem value="High">High</SelectItem>
-                                <SelectItem value="Medium">Medium</SelectItem>
-                                <SelectItem value="Low">Low</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>ID</TableHead>
-                                <TableHead>User</TableHead>
-                                <TableHead>Subject</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Priority</TableHead>
-                                <TableHead>Created</TableHead>
-                                <TableHead>Actions</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {filteredTickets.map((ticket) => (
-                                <TableRow key={ticket.id}>
-                                    <TableCell>{ticket.id}</TableCell>
-                                    <TableCell>{ticket.user}</TableCell>
-                                    <TableCell>{ticket.subject}</TableCell>
-                                    <TableCell>
-                                        <Badge className={getStatusColor(ticket.status)}>{ticket.status}</Badge>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge className={getPriorityColor(ticket.priority)}>{ticket.priority}</Badge>
-                                    </TableCell>
-                                    <TableCell>{ticket.created}</TableCell>
-                                    <TableCell>
-                                        <Button variant="outline" size="sm" onClick={() => setSelectedTicket(ticket)}>
-                                            View
-                                        </Button>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                <CardContent className="space-y-2">
+                    <p><strong>Email:</strong> support@skytutors.com</p>
+                    <p><strong>Phone:</strong> +1 (555) 123-4567</p>
+                    <p><strong>Hours:</strong> Monday - Friday, 9am - 5pm GMT</p>
                 </CardContent>
             </Card>
-
-            <Dialog open={selectedTicket !== null} onOpenChange={() => setSelectedTicket(null)}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle>Ticket #{selectedTicket?.id}</DialogTitle>
-                        <DialogDescription>
-                            View and respond to the support ticket.
-                        </DialogDescription>
-                    </DialogHeader>
-                    {selectedTicket && (
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="user" className="text-right">User</Label>
-                                <Input id="user" value={selectedTicket.user} className="col-span-3" readOnly />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="subject" className="text-right">Subject</Label>
-                                <Input id="subject" value={selectedTicket.subject} className="col-span-3" readOnly />
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="status" className="text-right">Status</Label>
-                                <Select defaultValue={selectedTicket.status}>
-                                    <SelectTrigger className="col-span-3">
-                                        <SelectValue placeholder="Select status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="Open">Open</SelectItem>
-                                        <SelectItem value="In Progress">In Progress</SelectItem>
-                                        <SelectItem value="Closed">Closed</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="priority" className="text-right">Priority</Label>
-                                <Select defaultValue={selectedTicket.priority}>
-                                    <SelectTrigger className="col-span-3">
-                                        <SelectValue placeholder="Select priority" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="High">High</SelectItem>
-                                        <SelectItem value="Medium">Medium</SelectItem>
-                                        <SelectItem value="Low">Low</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="response" className="text-right">Response</Label>
-                                <Textarea id="response" placeholder="Type your response here..." className="col-span-3" />
-                            </div>
-                        </div>
-                    )}
-                    <DialogFooter>
-                        <Button type="submit" onClick={() => setSelectedTicket(null)}>Send Response</Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
 
         </div>
     )
