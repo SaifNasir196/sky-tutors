@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  DROPPED
+  ON_HOLD
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum Role {
+  TUTOR
+  STUDENT
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  firstName String
+  lastName  String
+  password  String
+  role      Role
+  tutor     Tutor?
+  student   Student?
+  admin     Admin?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Tutor {
+  id             String       @id @default(uuid())
+  qualifications String?
+  biography      String?
+  userId         String       @unique
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payouts        Payout[]
+  enrollments    Enrollment[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Student {
+  id             String       @id @default(uuid())
+  educationLevel String?
+  userId         String       @unique
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments       Payment[]
+  enrollments    Enrollment[]
+  reviews        Review[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Admin {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Course {
+  id          String       @id @default(uuid())
+  name        String
+  description String?
+  enrollments Enrollment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Enrollment {
+  id                 String           @id @default(uuid())
+  tutor              Tutor            @relation(fields: [tutorId], references: [id], onDelete: Cascade)
+  tutorId            String
+  student            Student          @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId          String
+  course             Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId           String
+  status             EnrollmentStatus @default(ACTIVE)
+  hourlyPaymentRate  Float
+  hourlyPayoutRate   Float
+  hourlyDiscountRate Float
+  paymentBalance     Float
+  payoutBalance      Float
+  sessions           Session[]
+  Transaction        Transaction[]
+  Review             Review?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@unique([tutorId, studentId, courseId])
+}
+
+model Session {
+  id           String     @id @default(uuid())
+  dateTime     DateTime
+  duration     Int // Duration in minutes
+  enrollmentId String
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Transaction {
+  id           String            @id @default(uuid())
+  amount       Float
+  type         TransactionType
+  status       TransactionStatus @default(PENDING)
+  enrollmentId String
+  enrollment   Enrollment        @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+enum TransactionType {
+  PAYMENT
+  PAYOUT
+  PAYMENT_REFUND
+  PAYOUT_REFUND
+}
+
+model Review {
+  id           String     @id @default(uuid())
+  rating       Int
+  comment      String?
+  enrollmentId String     @unique
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}

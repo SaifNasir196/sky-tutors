@@ -1,14 +1,20 @@
-import { ReactNode } from 'react'
+import { checkRole } from "@/lib/utils/roles";
+import { redirect } from "next/navigation";
+import LayoutComponent from "./components/layoutComponent";
 
-
-const RootLayout = ({ children }: { children: ReactNode }) => {
-  return (
-    <main>
-      {/* Sidebar */}
-
-      {children}
-    </main>
-  )
+export default function RootLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
+    if (!checkRole('student')) {
+        redirect('/')
+    }
+    return (
+        <div className="flex min-h-screen h-full bg-background">
+            <LayoutComponent>
+                {children}
+            </LayoutComponent>
+        </div>
+    );
 }
-
-export default RootLayout;
